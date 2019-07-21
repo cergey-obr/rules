@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
+use stdClass;
 use App\Exceptions\DbErrorException;
+use App\Repository\ActionRepository;
 
 class Rule extends AbstractModel
 {
@@ -12,17 +14,18 @@ class Rule extends AbstractModel
     protected $action_id;
 
     /**
-     * @param \stdClass $object
+     * @param stdClass $object
      *
      * @return bool
-     * @throws DbErrorException
      */
-    public function evaluate(\stdClass $object): bool
+    public function evaluate(stdClass $object): bool
     {
-        $combination = $this->getCombination();
+        return true;
+
+        /*$combination = $this->getCombination();
         $combination->dbService = $this->dbService;
 
-        return $combination->check($object);
+        return $combination->check($object);*/
     }
 
     /**
@@ -31,11 +34,8 @@ class Rule extends AbstractModel
      */
     public function getAction(): Action
     {
-        $sql = "SELECT * FROM rules.action WHERE id = '%s'";
-        $result = $this->dbService->execute(sprintf($sql, $this->action_id));
-
         /** @var Action $action */
-        $action = $result->fetch_object(Action::class);
+        $action = (new ActionRepository())->findById($this->action_id, Action::class);
         return $action;
     }
 
@@ -43,13 +43,12 @@ class Rule extends AbstractModel
      * @return Combination
      * @throws DbErrorException
      */
-    private function getCombination(): Combination
+    /*private function getCombination(): Combination
     {
         $sql = "SELECT * FROM rules.combination WHERE id = '%s'";
         $result = $this->dbService->execute(sprintf($sql, $this->id));
 
-        /** @var Combination $combination */
         $combination = $result->fetch_object(Combination::class);
         return $combination;
-    }
+    }*/
 }
