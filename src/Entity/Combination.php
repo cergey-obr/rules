@@ -24,7 +24,7 @@ class Combination extends AbstractEntity
      */
     public function getAggregator(): string
     {
-        return $this->aggregator;
+        return (string)$this->aggregator;
     }
 
     /**
@@ -32,7 +32,7 @@ class Combination extends AbstractEntity
      */
     public function getOperator(): string
     {
-        return $this->operator;
+        return (string)$this->operator;
     }
 
     /**

@@ -24,7 +24,7 @@ class Condition extends AbstractEntity
      */
     public function getAttribute(): string
     {
-        return $this->attribute;
+        return (string)$this->attribute;
     }
 
     /**
@@ -32,7 +32,7 @@ class Condition extends AbstractEntity
      */
     public function getOperator(): string
     {
-        return $this->operator;
+        return (string)$this->operator;
     }
 
     /**
@@ -40,7 +40,7 @@ class Condition extends AbstractEntity
      */
     public function getValue(): string
     {
-        return $this->value;
+        return (string)$this->value;
     }
 
 }
