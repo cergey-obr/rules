@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Model\Rule;
-use App\Repository\ActionRepository;
 use App\Repository\RuleRepository;
+use App\Repository\ActionRepository;
 
 class RuleService
 {
@@ -33,8 +33,7 @@ class RuleService
             foreach ($this->ruleRepository->getAvailableRules($target) as $rule) {
                 if ($rule->evaluate($object)) {
                     $action = $this->actionRepository->findById($rule->getActionId());
-                    $test = 1;
-                    //$action->execute();
+                    $action->execute();
                 }
             }
         } catch (\Exception $e) {
