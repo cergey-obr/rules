@@ -6,7 +6,7 @@ use App\Model\Rule;
 use App\Repository\RuleRepository;
 use App\Repository\ActionRepository;
 
-class RuleService
+class Service
 {
     private $ruleRepository;
 

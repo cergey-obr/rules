@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\RuleService;
+use App\Service\Service;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,11 +14,11 @@ class IndexController extends AbstractController
      * @Route("/test", methods={"GET"}, name="test")
      *
      * @param Request $request
-     * @param RuleService $service
+     * @param Service $service
      *
      * @return JsonResponse
      */
-    public function test(Request $request, RuleService $service): JsonResponse
+    public function test(Request $request, Service $service): JsonResponse
     {
         $object = (object)['price' => 100];
         $service->applyRules('product', $object);
