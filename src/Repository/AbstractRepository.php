@@ -32,14 +32,15 @@ abstract class AbstractRepository
     }
 
     /**
-     * @param int $id
+     * @param int $value
+     * @param string $field
      *
      * @return object|stdClass
      * @throws DbErrorException
      */
-    public function findById(int $id)
+    public function find(int $value, string $field = 'id')
     {
-        $result = $this->dbService->execute("SELECT * FROM {$this->table} WHERE id = '{$id}'");
+        $result = $this->dbService->execute("SELECT * FROM {$this->table} WHERE {$field} = '{$value}'");
         return $result->fetch_object($this->model);
     }
 }

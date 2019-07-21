@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Model\Rule;
+use App\Entity\Rule;
 use App\Exceptions\DbErrorException;
 
 class RuleRepository extends AbstractRepository

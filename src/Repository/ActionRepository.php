@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Model\Action;
+use App\Entity\Action;
 
 class ActionRepository extends AbstractRepository
 {
