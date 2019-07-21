@@ -4,14 +4,13 @@ namespace App\Model;
 
 use stdClass;
 use App\Exceptions\DbErrorException;
-use App\Repository\ActionRepository;
 
 class Rule extends AbstractModel
 {
     /**
      * @var integer
      */
-    protected $action_id;
+    private $action_id;
 
     /**
      * @param stdClass $object
@@ -29,14 +28,11 @@ class Rule extends AbstractModel
     }
 
     /**
-     * @return Action
-     * @throws DbErrorException
+     * @return int
      */
-    public function getAction(): Action
+    public function getActionId(): int
     {
-        /** @var Action $action */
-        $action = (new ActionRepository())->findById($this->action_id, Action::class);
-        return $action;
+        return (int)$this->action_id;
     }
 
     /**

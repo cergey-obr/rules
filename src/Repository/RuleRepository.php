@@ -2,21 +2,23 @@
 
 namespace App\Repository;
 
-use Generator;
 use App\Model\Rule;
 use App\Exceptions\DbErrorException;
 
 class RuleRepository extends AbstractRepository
 {
+    protected $table = 'rule';
+    protected $model = Rule::class;
+
     /**
      * @param string $target
      *
-     * @return Generator
+     * @return \Generator
      * @throws DbErrorException
      */
-    public function getAvailableRules(string $target): Generator
+    public function getAvailableRules(string $target): \Generator
     {
-        $sql = "SELECT * FROM rules.rule WHERE target = '%s' 
+        $sql = "SELECT * FROM {$this->table} WHERE target = '%s' 
             AND (date_from is null or date_from <= '%s') 
             AND (date_to is null or date_to >= '%s') 
             AND active = true 

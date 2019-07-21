@@ -9,35 +9,37 @@ use App\Exceptions\DbErrorException;
 abstract class AbstractRepository
 {
     /**
-     * @var DbService
-     */
-    protected $dbService;
-
-    /**
      * @var string
      */
     protected $table;
 
     /**
-     * @param DbService|null $dbService
+     * @var string
      */
-    public function __construct(?DbService $dbService = null)
+    protected $model;
+
+    /**
+     * @var DbService
+     */
+    protected $dbService;
+
+    /**
+     * @param DbService $dbService
+     */
+    public function __construct(DbService $dbService)
     {
-        if (!$this->dbService) {
-            $this->dbService = $dbService;
-        }
+        $this->dbService = $dbService;
     }
 
     /**
      * @param int $id
-     * @param string $className
      *
      * @return object|stdClass
      * @throws DbErrorException
      */
-    public function findById(int $id, string $className)
+    public function findById(int $id)
     {
         $result = $this->dbService->execute("SELECT * FROM {$this->table} WHERE id = '{$id}'");
-        return $result->fetch_object($className);
+        return $result->fetch_object($this->model);
     }
 }

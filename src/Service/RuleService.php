@@ -3,21 +3,23 @@
 namespace App\Service;
 
 use App\Model\Rule;
+use App\Repository\ActionRepository;
 use App\Repository\RuleRepository;
 
 class RuleService
 {
-    /**
-     * @var DbService
-     */
-    private $dbService;
+    private $ruleRepository;
+
+    private $actionRepository;
 
     /**
-     * @param DbService $dbService
+     * @param RuleRepository $ruleRepository
+     * @param ActionRepository $actionRepository
      */
-    public function __construct(DbService $dbService)
+    public function __construct(RuleRepository $ruleRepository, ActionRepository $actionRepository)
     {
-        $this->dbService = $dbService;
+        $this->ruleRepository = $ruleRepository;
+        $this->actionRepository = $actionRepository;
     }
 
     /**
@@ -27,12 +29,11 @@ class RuleService
     public function applyRules(string $target, \stdClass $object): void
     {
         try {
-            $ruleRepository = new RuleRepository($this->dbService);
-
             /** @var Rule $rule */
-            foreach ($ruleRepository->getAvailableRules($target) as $rule) {
+            foreach ($this->ruleRepository->getAvailableRules($target) as $rule) {
                 if ($rule->evaluate($object)) {
-                    $action = $rule->getAction();
+                    $action = $this->actionRepository->findById($rule->getActionId());
+                    $test = 1;
                     //$action->execute();
                 }
             }
