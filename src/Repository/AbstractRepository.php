@@ -36,10 +36,11 @@ abstract class AbstractRepository
      *
      * @return object|stdClass
      * @throws DbErrorException
+     * @throws \Exception
      */
     public function findById(int $id)
     {
-        $result = $this->dbService->execute("SELECT * FROM {$this->table} WHERE id = '{$id}'");
+        $result = $this->dbService->getConnection()->execute("SELECT * FROM {$this->table} WHERE id = '{$id}'");
         return $result->fetch_object($this->model);
     }
 }

@@ -15,6 +15,7 @@ class RuleRepository extends AbstractRepository
      *
      * @return \Generator
      * @throws DbErrorException
+     * @throws \Exception
      */
     public function getAvailableRules(string $target): \Generator
     {
@@ -24,7 +25,7 @@ class RuleRepository extends AbstractRepository
             AND active = true 
         ORDER BY priority DESC";
 
-        $result = $this->dbService->execute(sprintf($sql, $target, $now = date('Y-m-d'), $now));
+        $result = $this->dbService->getConnection()->execute(sprintf($sql, $target, $now = date('Y-m-d'), $now));
         while ($rule = $result->fetch_object(Rule::class)) {
             yield $rule;
         }

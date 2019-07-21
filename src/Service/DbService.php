@@ -12,27 +12,30 @@ class DbService
     protected $connection;
 
     /**
-     * @param string $dbUrl
-     *
      * @throws \Exception
      */
-    public function __construct(string $dbUrl)
+    public function getConnection()
     {
-        $dbParams = parse_url($dbUrl);
+        if (!$this->connection) {
+            // Тут какую-нибудь хрень придумать как доставать конфиг, можно свой yaml например
+            $dbParams = parse_url($_ENV['DATABASE_URL']);
 
-        $connection = new \mysqli(
-            $dbParams['host'] ?? '',
-            $dbParams['user'] ?? '',
-            $dbParams['pass'] ?? '',
-            substr($dbParams['path'] ?? '', 1),
-            $dbParams['port'] ?? 3306
-        );
+            $connection = new \mysqli(
+                $dbParams['host'] ?? '',
+                $dbParams['user'] ?? '',
+                $dbParams['pass'] ?? '',
+                substr($dbParams['path'] ?? '', 1),
+                $dbParams['port'] ?? 3306
+            );
 
-        if ($connection->connect_errno) {
-            throw new \Exception("Failed connection to database");
+            if ($connection->connect_errno) {
+                throw new \Exception("Failed connection to database");
+            }
+
+            $this->connection = $connection;
         }
 
-        $this->connection = $connection;
+        return $this;
     }
 
     /**
