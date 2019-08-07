@@ -5,6 +5,7 @@ namespace Optimax\RuleBundle\Service;
 use Optimax\RuleBundle\Entity\Rule;
 use Optimax\RuleBundle\Repository\RuleRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class RuleService
 {
@@ -14,11 +15,18 @@ class RuleService
     private $entityManager;
 
     /**
-     * @param EntityManager $entityManager
+     * @var ParameterBagInterface
      */
-    public function __construct(EntityManager $entityManager)
+    private $params;
+
+    /**
+     * @param EntityManager $entityManager
+     * @param ParameterBagInterface $params
+     */
+    public function __construct(EntityManager $entityManager, ParameterBagInterface $params)
     {
         $this->entityManager = $entityManager;
+        $this->params = $params;
     }
 
     /**
@@ -42,8 +50,11 @@ class RuleService
 
         /** @var Rule $rule */
         foreach ($ruleRepository->getAvailableRules($target) as $rule) {
-            $rule->check($object, $subject, $request);
-            // $rule->getAction()->execute($object);
+            $rule->setObject($object)
+                ->setSubject($subject)
+                ->setRequest($request);
+
+            $rule->getAction($this->params)->execute($object);
         }
     }
 }

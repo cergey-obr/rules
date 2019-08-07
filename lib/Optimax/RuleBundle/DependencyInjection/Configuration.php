@@ -16,8 +16,7 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('dir_name')->defaultValue('%kernel.root_dir%/RuleActions')->cannotBeEmpty()->end()
-                ->scalarNode('namespace')->defaultValue('OptimaxRuleAction')->cannotBeEmpty()->end()
+                ->scalarNode('namespace')->cannotBeEmpty()->end()
             ->end();
 
         return $treeBuilder;

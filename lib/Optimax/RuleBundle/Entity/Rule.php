@@ -2,10 +2,27 @@
 
 namespace Optimax\RuleBundle\Entity;
 
+use Optimax\RuleBundle\RuleActions\ActionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class Rule extends AbstractCombination
 {
+    /**
+     * @var mixed
+     */
+    private $object;
+
+    /**
+     * @var mixed
+     */
+    private $subject;
+
+    /**
+     * @var Request
+     */
+    private $request;
+
     /**
      * @var int
      */
@@ -52,10 +69,48 @@ class Rule extends AbstractCombination
     private $priority;
 
     /**
-     * @return Action
+     * @param mixed $object
+     *
+     * @return Rule
+     */
+    public function setObject($object): self
+    {
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * @param $subject
+     *
+     * @return Rule
+     */
+    public function setSubject($subject): self
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return Rule
+     */
+    public function setRequest(Request $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * @param ParameterBagInterface $params
+     *
+     * @return ActionInterface
      * @throws \Exception
      */
-    public function getAction(): Action
+    public function getAction(ParameterBagInterface $params): ActionInterface
     {
         /** @var Action $action */
         $action = $this->entityManager
@@ -66,7 +121,11 @@ class Rule extends AbstractCombination
             throw new \Exception("Action for rule (id: {$this->id}) not found");
         }
 
-        return $action;
+        /*if ($combination = $action->getCombination()) {
+            $combination->check($this->object, $this->subject, $this->request);
+        }*/
+
+        return $action->load($params);
     }
 
     /**
@@ -136,19 +195,15 @@ class Rule extends AbstractCombination
     }
 
     /**
-     * @param mixed $object
-     * @param mixed $subject
-     * @param Request $request
-     *
      * @throws \Exception
      */
-    public function check($object, $subject, Request $request): void
+    public function check(): void
     {
         /** @var Combination $combination */
         if (!$combination = $this->getCombinationById($this->combination_id)) {
             throw new \Exception("Combination for rule (id: {$this->id}) not found");
         }
 
-        $combination->check($object, $subject, $request);
+        $combination->check($this->object, $this->subject, $this->request);
     }
 }

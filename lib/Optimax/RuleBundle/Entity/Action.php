@@ -2,6 +2,9 @@
 
 namespace Optimax\RuleBundle\Entity;
 
+use Optimax\RuleBundle\RuleActions\ActionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 class Action extends AbstractCombination
 {
     /**
@@ -48,5 +51,15 @@ class Action extends AbstractCombination
     public function isStopProcessing(): bool
     {
         return (bool)$this->stop_processing;
+    }
+
+    public function load(ParameterBagInterface $params): ActionInterface
+    {
+        $className = $params->get('optimax_rule.namespace') . '\PercentAction';
+        if (!class_exists($className)) {
+            throw new \InvalidArgumentException("Undefined action");
+        }
+
+        return new $className();
     }
 }
