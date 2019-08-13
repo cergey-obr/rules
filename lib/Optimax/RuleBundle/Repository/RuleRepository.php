@@ -28,8 +28,8 @@ class RuleRepository extends AbstractRepository
     public function getAvailableRules(string $target): \Generator
     {
         $sql = "SELECT * FROM `{$this->getTableName()}` WHERE target = ? 
-            AND (date_from is null or date_from <= ?) 
-            AND (date_to is null or date_to >= ?) 
+            AND (dateFrom is null or dateFrom <= ?) 
+            AND (dateTo is null or dateTo >= ?) 
             AND active = 1 
         ORDER BY priority DESC";
 

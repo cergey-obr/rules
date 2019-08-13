@@ -2,36 +2,20 @@
 
 namespace Optimax\RuleBundle\Entity;
 
-use Optimax\RuleBundle\RuleActions\ActionInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Optimax\RuleBundle\Environment\AbstractEnvironment;
+use Optimax\RuleBundle\Exceptions\CheckRuleException;
 
 class Rule extends AbstractCombination
 {
     /**
-     * @var mixed
+     * @var int
      */
-    private $object;
-
-    /**
-     * @var mixed
-     */
-    private $subject;
-
-    /**
-     * @var Request
-     */
-    private $request;
+    private $actionId;
 
     /**
      * @var int
      */
-    private $action_id;
-
-    /**
-     * @var int
-     */
-    private $combination_id;
+    private $combinationId;
 
     /**
      * @var bool
@@ -44,14 +28,14 @@ class Rule extends AbstractCombination
     private $target;
 
     /**
-     * @var \DateTime|null
+     * @var string|null
      */
-    private $date_from;
+    private $dateFrom;
 
     /**
-     * @var \DateTime|null
+     * @var string|null
      */
-    private $date_to;
+    private $dateTo;
 
     /**
      * @var string
@@ -70,62 +54,34 @@ class Rule extends AbstractCombination
 
     /**
      * @param mixed $object
+     * @param mixed $subject
+     * @param AbstractEnvironment $environment
      *
-     * @return Rule
-     */
-    public function setObject($object): self
-    {
-        $this->object = $object;
-
-        return $this;
-    }
-
-    /**
-     * @param $subject
-     *
-     * @return Rule
-     */
-    public function setSubject($subject): self
-    {
-        $this->subject = $subject;
-
-        return $this;
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return Rule
-     */
-    public function setRequest(Request $request): self
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * @param ParameterBagInterface $params
-     *
-     * @return ActionInterface
+     * @return Action
      * @throws \Exception
+     * @throws CheckRuleException
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getAction(ParameterBagInterface $params): ActionInterface
+    public function getAction($object, $subject, AbstractEnvironment $environment): Action
     {
-        /** @var Action $action */
+        /** @var Action|null $action */
         $action = $this->entityManager
             ->getRepository('action')
-            ->find($this->action_id);
+            ->find($this->actionId);
 
         if (!$action) {
             throw new \Exception("Action for rule (id: {$this->id}) not found");
         }
 
-        /*if ($combination = $action->getCombination()) {
-            $combination->check($this->object, $this->subject, $this->request);
-        }*/
+        if ($combination = $action->getCombination()) {
+            try {
+                $combination->check($object, $subject, $environment);
+            } catch (\Exception $e) {
+                throw new CheckRuleException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
 
-        return $action->load($params);
+        return $action;
     }
 
     /**
@@ -149,7 +105,7 @@ class Rule extends AbstractCombination
      */
     public function getDateFrom(): ?\DateTime
     {
-        $date = $this->date_from;
+        $date = $this->dateFrom;
         try {
             return $date ? new \DateTime($date) : null;
         } catch (\Exception $e) {
@@ -162,7 +118,7 @@ class Rule extends AbstractCombination
      */
     public function getDateTo(): ?\DateTime
     {
-        $date = $this->date_to;
+        $date = $this->dateTo;
         try {
             return $date ? new \DateTime($date) : null;
         } catch (\Exception $e) {
@@ -195,15 +151,23 @@ class Rule extends AbstractCombination
     }
 
     /**
-     * @throws \Exception
+     * @param mixed $object
+     * @param mixed $subject
+     * @param AbstractEnvironment $environment
+     *
+     * @throws CheckRuleException
      */
-    public function check(): void
+    public function check($object, $subject, AbstractEnvironment $environment): void
     {
         /** @var Combination $combination */
-        if (!$combination = $this->getCombinationById($this->combination_id)) {
-            throw new \Exception("Combination for rule (id: {$this->id}) not found");
+        if (!$combination = $this->getCombinationById($this->combinationId)) {
+            throw new CheckRuleException("Combination for rule (id: {$this->id}) not found");
         }
 
-        $combination->check($this->object, $this->subject, $this->request);
+        try {
+            $combination->check($object, $subject, $environment);
+        } catch (\Exception $e) {
+            throw new CheckRuleException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

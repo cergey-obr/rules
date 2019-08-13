@@ -63,6 +63,7 @@ class Version20190718070114 extends AbstractMigration
         $actionTable->addColumn('typeId', Type::INTEGER);
         $actionTable->addColumn('combinationId', Type::INTEGER)->setNotnull(false);
         $actionTable->addColumn('stopProcessing', Type::BOOLEAN);
+        $actionTable->addColumn('code', Type::TEXT);
         $actionTable->setPrimaryKey(['id']);
 
         return $actionTable;

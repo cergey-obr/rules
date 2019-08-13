@@ -3,6 +3,7 @@
 namespace Optimax\RuleBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
@@ -14,9 +15,12 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('optimax_rules');
 
-        $treeBuilder->getRootNode()
-            ->children()
-                ->scalarNode('namespace')->cannotBeEmpty()->end()
+        /** @var ArrayNodeDefinition $rootNode */
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode->children()
+            ->scalarNode('namespace')
+                ->cannotBeEmpty()
             ->end();
 
         return $treeBuilder;

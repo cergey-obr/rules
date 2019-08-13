@@ -7,5 +7,5 @@ interface ActionInterface
     /**
      * @param mixed $object
      */
-    public function execute(&$object): void;
+    public function execute($object): void;
 }

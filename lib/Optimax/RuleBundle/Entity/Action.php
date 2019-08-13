@@ -3,35 +3,38 @@
 namespace Optimax\RuleBundle\Entity;
 
 use Optimax\RuleBundle\RuleActions\ActionInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class Action extends AbstractCombination
 {
     /**
      * @var int
      */
-    private $type_id;
+    private $typeId;
 
     /**
      * @var int
      */
-    private $combination_id;
+    private $combinationId;
 
     /**
      * @var bool
      */
-    private $stop_processing;
+    private $stopProcessing;
 
     /**
-     * @return ActionType|null
+     * @return ActionType
      * @throws \Exception
      */
-    public function getType(): ?ActionType
+    public function getType(): ActionType
     {
-        /** @var ActionType $actionType */
+        /** @var ActionType|null $actionType */
         $actionType = $this->entityManager
             ->getRepository('actionType')
-            ->find($this->type_id);
+            ->find($this->typeId);
+
+        if (!$actionType) {
+            throw new \Exception('Action type not found');
+        }
 
         return $actionType;
     }
@@ -42,7 +45,7 @@ class Action extends AbstractCombination
      */
     public function getCombination(): ?Combination
     {
-        return $this->getCombinationById($this->combination_id);
+        return $this->combinationId ? $this->getCombinationById($this->combinationId) : null;
     }
 
     /**
@@ -50,14 +53,21 @@ class Action extends AbstractCombination
      */
     public function isStopProcessing(): bool
     {
-        return (bool)$this->stop_processing;
+        return (bool)$this->stopProcessing;
     }
 
-    public function load(ParameterBagInterface $params): ActionInterface
+    /**
+     * @param string $namespace
+     *
+     * @return ActionInterface
+     * @throws \Exception
+     */
+    public function load(string $namespace): ActionInterface
     {
-        $className = $params->get('optimax_rule.namespace') . '\PercentAction';
+        $code = str_replace('_', '', ucwords($this->getType()->getCode(), '_'));
+        $className = $namespace . '\\' . $code . 'Action';
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException("Undefined action");
+            throw new \InvalidArgumentException("Undefined action $className");
         }
 
         return new $className();

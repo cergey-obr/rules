@@ -52,7 +52,11 @@ abstract class AbstractRepository
         $object = $statement->fetch();
         $statement->closeCursor();
 
-        return $object ?: null;
+        if ($object instanceof AbstractEntity) {
+            return $object;
+        }
+
+        return null;
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Optimax\RuleBundle\Entity;
 
-use Symfony\Component\HttpFoundation\Request;
 use Optimax\RuleBundle\Service\ConditionService;
+use Optimax\RuleBundle\Environment\AbstractEnvironment;
 
 class Condition extends AbstractEntity
 {
@@ -27,19 +27,19 @@ class Condition extends AbstractEntity
     /**
      * @param mixed $object
      * @param mixed $subject
-     * @param Request $request
+     * @param AbstractEnvironment $environment
      *
      * @return bool
      */
-    public function isValid($object, $subject, Request $request): bool
+    public function isValid($object, $subject, AbstractEnvironment $environment): bool
     {
         $conditionService = new ConditionService();
-        $type = strtok($this->attribute, self::DELIMITER);
-        $this->attribute = substr($this->attribute, strlen($type) + 1);
+        $paths = explode(self::DELIMITER, $this->attribute);
+        $type = array_shift($paths);
 
         switch ($type) {
-            case 'request':
-                $object = $request;
+            case 'env':
+                $object = $environment;
                 break;
 
             case 'subject':
@@ -47,26 +47,26 @@ class Condition extends AbstractEntity
                 break;
         }
 
-        return $conditionService->check($this->operator, $this->getObjectValue($object), $this->value);
+        return $conditionService->check($this->operator, $this->getObjectValue($paths, $object), $this->value);
     }
 
     /**
-     * @param mixed $object
+     * @param array $paths
+     * @param object|array $object
      *
      * @return mixed
      */
-    private function getObjectValue($object)
+    public function getObjectValue(array $paths, $object)
     {
-        foreach (explode(self::DELIMITER, $this->attribute) as $propertyName) {
-            if ($object instanceof Request) {
-                $object = $object->get($propertyName, '');
-            } elseif (is_object($object) && property_exists($object, $propertyName)) {
-                $object = $object->$propertyName;
-            } elseif (is_array($object)) {
-                $object = $object[$propertyName] ?? '';
-            } else {
-                return '';
+        foreach ($paths as $propertyName) {
+            array_shift($paths);
+
+            if (is_object($object)) {
+                $object = (array)$object;
             }
+
+            $propertyValue = $object[$propertyName] ?? '';
+            return $this->getObjectValue($paths, $propertyValue);
         }
 
         return $object;
