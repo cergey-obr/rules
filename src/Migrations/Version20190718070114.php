@@ -20,12 +20,13 @@ class Version20190718070114 extends AbstractMigration
         $combinationTable = $this->createCombinationTable($schema);
         $conditionTable = $this->createConditionTable($schema);
 
-        $ruleTable->addForeignKeyConstraint($combinationTable, ['combinationId'], ['id']);
-        $ruleTable->addForeignKeyConstraint($actionTable, ['actionId'], ['id']);
+        $foreignKeyOptions = ['onDelete' => 'CASCADE'];
+        $actionTable->addForeignKeyConstraint($ruleTable, ['ruleId'], ['id'], $foreignKeyOptions);
         $actionTable->addForeignKeyConstraint($actionTypeTable, ['typeId'], ['id']);
-        $actionTable->addForeignKeyConstraint($combinationTable, ['combinationId'], ['id']);
-        $combinationTable->addForeignKeyConstraint($combinationTable, ['parentId'], ['id']);
-        $conditionTable->addForeignKeyConstraint($combinationTable, ['combinationId'], ['id']);
+        $combinationTable->addForeignKeyConstraint($ruleTable, ['ruleId'], ['id'], $foreignKeyOptions);
+        $combinationTable->addForeignKeyConstraint($actionTable, ['actionId'], ['id'], $foreignKeyOptions);
+        $combinationTable->addForeignKeyConstraint($combinationTable, ['parentId'], ['id'], $foreignKeyOptions);
+        $conditionTable->addForeignKeyConstraint($combinationTable, ['combinationId'], ['id'], $foreignKeyOptions);
     }
 
     /**
@@ -37,8 +38,6 @@ class Version20190718070114 extends AbstractMigration
     {
         $ruleTable = $schema->createTable('rule');
         $ruleTable->addColumn('id', Type::INTEGER)->setAutoincrement(true);
-        $ruleTable->addColumn('combinationId', Type::INTEGER);
-        $ruleTable->addColumn('actionId', Type::INTEGER);
         $ruleTable->addColumn('active', Type::BOOLEAN);
         $ruleTable->addColumn('target', Type::STRING);
         $ruleTable->addColumn('dateFrom', Type::DATETIME)->setNotnull(false);
@@ -46,7 +45,7 @@ class Version20190718070114 extends AbstractMigration
         $ruleTable->addColumn('title', Type::TEXT);
         $ruleTable->addColumn('description', Type::TEXT)->setNotnull(false);
         $ruleTable->addColumn('priority', Type::INTEGER)->setNotnull(false);
-        $ruleTable->setPrimaryKey(['id'])->addUniqueIndex(['combinationId', 'actionId']);
+        $ruleTable->setPrimaryKey(['id']);
 
         return $ruleTable;
     }
@@ -60,11 +59,10 @@ class Version20190718070114 extends AbstractMigration
     {
         $actionTable = $schema->createTable('action');
         $actionTable->addColumn('id', Type::INTEGER)->setAutoincrement(true);
+        $actionTable->addColumn('ruleId', Type::INTEGER);
         $actionTable->addColumn('typeId', Type::INTEGER);
-        $actionTable->addColumn('combinationId', Type::INTEGER)->setNotnull(false);
-        $actionTable->addColumn('stopProcessing', Type::BOOLEAN);
-        $actionTable->addColumn('code', Type::TEXT);
-        $actionTable->setPrimaryKey(['id']);
+        $actionTable->addColumn('stopProcessing', Type::BOOLEAN)->setDefault(false);
+        $actionTable->setPrimaryKey(['id'])->addUniqueIndex(['ruleId']);
 
         return $actionTable;
     }
@@ -94,11 +92,12 @@ class Version20190718070114 extends AbstractMigration
     {
         $combinationTable = $schema->createTable('combination');
         $combinationTable->addColumn('id', Type::INTEGER)->setAutoincrement(true);
+        $combinationTable->addColumn('ruleId', Type::INTEGER)->setNotnull(false);
+        $combinationTable->addColumn('actionId', Type::INTEGER)->setNotnull(false);
         $combinationTable->addColumn('parentId', Type::INTEGER)->setNotnull(false);
         $combinationTable->addColumn('aggregator', Type::STRING);
-        $combinationTable->addColumn('operator', Type::STRING)->setNotnull(false);
         $combinationTable->addColumn('value', Type::STRING);
-        $combinationTable->setPrimaryKey(['id']);
+        $combinationTable->setPrimaryKey(['id'])->addUniqueIndex(['ruleId', 'actionId']);
 
         return $combinationTable;
     }

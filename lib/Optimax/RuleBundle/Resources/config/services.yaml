@@ -1,5 +1,0 @@
-services:
-    Optimax\RuleBundle\:
-        resource: '../../'
-        autowire: true
-        exclude: '../../{DependencyInjection,Migrations}'
