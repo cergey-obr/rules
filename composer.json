@@ -24,7 +24,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/",
-            "Optimax\\RuleBundle\\": "lib/Optimax/RuleBundle"
+            "Optimax\\RuleBundle\\": "lib/Optimax/rule-bundle/src"
         }
     },
     "autoload-dev": {
