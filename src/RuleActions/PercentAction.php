@@ -2,9 +2,9 @@
 
 namespace App\RuleActions;
 
-use Optimax\RuleBundle\RuleActions\ActionInterface;
+use Optimax\RuleBundle\RuleActions\AbstractAction;
 
-class PercentAction implements ActionInterface
+class PercentAction extends AbstractAction
 {
     public function execute($object): void
     {
