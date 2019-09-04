@@ -6,7 +6,7 @@ use Optimax\RuleBundle\RuleActions\AbstractAction;
 
 class PercentAction extends AbstractAction
 {
-    public function execute($object): void
+    public function execute(&$object): void
     {
         $object->price = 100;
     }
