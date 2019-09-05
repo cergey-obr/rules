@@ -3,9 +3,10 @@
     "license": "proprietary",
     "require": {
         "php": "^7.2",
-        "ext-json": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-json": "*",
+        "optimax/service-auth-bundle": "^4.1",
         "sensio/framework-extra-bundle": "^5.4",
         "symfony/console": "4.3.*",
         "symfony/dotenv": "4.3.*",
@@ -61,5 +62,11 @@
             "allow-contrib": false,
             "require": "4.3.*"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://composer.gusadev.com"
+        }
+    ]
 }
