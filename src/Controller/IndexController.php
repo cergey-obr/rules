@@ -6,12 +6,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Optimax\RuleBundle\Service\RuleService;
 
 class IndexController extends AbstractController
 {
     /**
      * @Route("/test", methods={"GET"}, name="test")
+     * @IsGranted("ROLE_ADMIN")
      *
      * @param Request $request
      * @param RuleService $service

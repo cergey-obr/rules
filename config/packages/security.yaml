@@ -8,11 +8,8 @@ security:
             security: false
 
         main:
+            anonymous: true
             stateless: true
             guard:
                 authenticators:
                     - optimax.auth_bundle.security.authenticator
-
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
